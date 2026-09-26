@@ -1,0 +1,20 @@
+{
+  "name": "converthub",
+  "version": "0.1.0",
+  "description": "Conversor de arquivos self-hosted: fila de jobs + workers (sharp/ffmpeg) + painel",
+  "main": "server.js",
+  "type": "module",
+  "license": "MIT",
+  "author": "Rodolfo Franco (FrancosCorporation)",
+  "scripts": {
+    "start": "node server.js",
+    "test": "NODE_ENV=test node --test test/converter-test.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "sharp": "^0.35.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

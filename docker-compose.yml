@@ -1,0 +1,14 @@
+services:
+  converthub:
+    build: .
+    ports:
+      - "3700:3700"
+    environment:
+      CONVERTHUB_DB: /data/jobs.db
+    volumes:
+      - dados:/data
+      - /tmp:/tmp
+    restart: unless-stopped
+
+volumes:
+  dados:
