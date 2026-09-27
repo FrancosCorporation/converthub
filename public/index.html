@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConvertHub — painel de jobs</title>
+  <style>
+    :root { --fundo:#0f1318; --carta:#1a2027; --borda:#2c3540; --texto:#e8edf2; --suave:#8b98a5; --verde:#2ea043; --vermelho:#f85149; --amarelo:#d29922; --azul:#388bfd; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:"Segoe UI",system-ui,Arial,sans-serif; background:var(--fundo); color:var(--texto); padding:20px; }
+    h1 { font-size:20px; } .sub { color:var(--suave); font-size:13px; margin-bottom:16px; }
+    .metricas { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .m { background:var(--carta); border:1px solid var(--borda); border-radius:10px; padding:12px 18px; }
+    .m b { font-size:20px; display:block; } .m span { color:var(--suave); font-size:12px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { border:1px solid var(--borda); padding:8px 10px; text-align:left; }
+    th { background:var(--carta); color:var(--suave); }
+    .badge { padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+    .pronto { background:var(--verde); color:#fff; }
+    .pendente { background:var(--amarelo); color:#111; }
+    .processando { background:var(--azul); color:#fff; }
+    .falhou { background:var(--vermelho); color:#fff; }
+    .erro { color:var(--vermelho); font-size:11px; }
+  </style>
+</head>
+<body>
+  <h1>🔄 ConvertHub</h1>
+  <p class="sub">fila de jobs + workers (sharp/ffmpeg) + validação por magic bytes — painel de conversões</p>
+  <div class="metricas" id="metricas"></div>
+  <table>
+    <thead><tr><th>Job</th><th>Arquivo</th><th>Tipo</th><th>→ Formato</th><th>Status</th><th>Progresso</th><th>Erro</th></tr></thead>
+    <tbody id="jobs"></tbody>
+  </table>
+  <script>
+    async function atualizar() {
+      try {
+        const m = await fetch('/api/metricas').then((r) => r.json());
+        document.getElementById('metricas').innerHTML = `
+          <div class="m"><b>${m.total}</b><span>jobs</span></div>
+          <div class="m"><b>${m.prontos}</b><span>prontos</span></div>
+          <div class="m"><b>${m.pendentes}</b><span>pendentes</span></div>
+          <div class="m"><b>${m.falhos}</b><span>falhos</span></div>
+          <div class="m"><b>${m.taxaSucesso.toFixed(1)}%</b><span>taxa de sucesso</span></div>`;
+        const jobs = await fetch('/api/jobs').then((r) => r.json());
+        document.getElementById('jobs').innerHTML = jobs.map((j) => `
+          <tr>
+            <td>${j.id.slice(0, 14)}…</td>
+            <td>${j.arquivo_entrada.split('/').pop()}</td>
+            <td>${j.tipo}</td>
+            <td>${j.formato_destino}</td>
+            <td><span class="badge ${j.status}">${j.status}</span></td>
+            <td>${j.progresso}%</td>
+            <td class="erro">${j.erro || ''}</td>
+          </tr>`).join('');
+      } catch {}
+    }
+    atualizar();
+    setInterval(atualizar, 3000);
+  </script>
+</body>
+</html>

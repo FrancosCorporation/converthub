@@ -1,6 +1,6 @@
 # ConvertHub — Self-hosted File Converter
 
-![Status](https://img.shields.io/badge/M1-funcionando%20(7%2F7%20testes)-brightgreen)
+![Status](https://img.shields.io/badge/M1b-funcionando%20(10%2F10%20testes)-brightgreen)
 ![CI](https://img.shields.io/badge/CI-test%20%2B%20license%20check-blue)
 ![Node](https://img.shields.io/badge/Node-%3E%3D18-green?logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -15,11 +15,24 @@ Self-hosted file conversion with a job queue: upload → queue (SQLite) → work
 
 ## Features
 
-- [x] **M1a** — Fila de jobs (SQLite) + workers: **Sharp** (imagem) e **ffmpeg** (áudio/vídeo) — 7/7 testes
+- [x] **M1a** — Fila de jobs (SQLite) + workers: **Sharp** (imagem) e **ffmpeg** (áudio/vídeo)
 - [x] **Validação por MAGIC BYTES** (não extensão): MP4 com nome .png é detectado como vídeo!
-- [x] Falha registra erro no job; métricas (taxa de sucesso)
-- [ ] **M1b** — Painel de jobs (status/progresso) + limits (tamanho/taxa)
-- [ ] **M2** — Worker pool com concorrência, múltiplos formatos, preview antes/depois
+- [x] **M1b** — Painel de jobs (status/progresso/erros em tempo real) + upload API + **download do resultado** + limite 50MB + worker pool 2x
+- [x] **E2E provado (10/10):** upload PNG → worker → download WEBP (RIFF) completo
+- [ ] **M2** — Múltiplos formatos por categoria, preview antes/depois
+
+## Quick start
+
+```bash
+docker compose up   # painel em http://localhost:3700
+```
+
+```bash
+# upload + conversão + download (fluxo completo)
+curl -X POST "http://localhost:3700/api/upload?formato=webp" --data-binary @foto.png
+# => {"id":"job_..."} — o worker converte; depois:
+curl -OJ http://localhost:3700/api/jobs/<id>/download
+```
 
 ## Quick start (planejado)
 

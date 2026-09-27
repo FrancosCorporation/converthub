@@ -18,12 +18,13 @@ export function criarFila(caminhoDb = 'converthub.db') {
     status TEXT NOT NULL CHECK (status IN ('pendente','processando','pronto','falhou')),
     progresso INTEGER NOT NULL DEFAULT 0,
     erro TEXT DEFAULT '',
+    saida TEXT DEFAULT '',
     criado_em TEXT NOT NULL DEFAULT (datetime('now'))
   );
   `);
 
   const inserir = db.prepare('INSERT INTO jobs (id, arquivo_entrada, tipo, formato_destino, status) VALUES (?, ?, ?, ?, ?)');
-  const marcar = db.prepare('UPDATE jobs SET status = ?, progresso = ?, erro = ? WHERE id = ?');
+  const marcar = db.prepare('UPDATE jobs SET status = ?, progresso = ?, erro = ?, saida = ? WHERE id = ?');
 
   return {
     db,
@@ -61,21 +62,21 @@ export function criarFila(caminhoDb = 'converthub.db') {
     async processarUm() {
       const job = db.prepare("SELECT * FROM jobs WHERE status = 'pendente' ORDER BY criado_em LIMIT 1").get();
       if (!job) return null;
-      marcar.run('processando', 10, '', job.id);
+      marcar.run('processando', 10, '', '', job.id);
       const destino = join(mkdtempSync(join(tmpdir(), 'ch-')), `saida.${job.formato_destino}`);
       try {
         if (job.tipo === 'imagem') await converterImagem(job.arquivo_entrada, destino, job.formato_destino);
         else await converterMidia(job.arquivo_entrada, destino, job.tipo, job.formato_destino);
-        marcar.run('pronto', 100, '', job.id);
+        marcar.run('pronto', 100, '', destino, job.id);
         return { id: job.id, ok: true, saida: destino };
       } catch (e) {
-        marcar.run('falhou', 100, String(e.message).slice(0, 300), job.id);
+        marcar.run('falhou', 100, String(e.message).slice(0, 300), '', job.id);
         return { id: job.id, ok: false, erro: e.message };
       }
     },
 
     listar(limite = 50) {
-      return db.prepare('SELECT id, arquivo_entrada, tipo, formato_destino, status, progresso, erro, criado_em FROM jobs ORDER BY criado_em DESC LIMIT ?').all(limite);
+      return db.prepare('SELECT id, arquivo_entrada, tipo, formato_destino, status, progresso, erro, saida, criado_em FROM jobs ORDER BY criado_em DESC LIMIT ?').all(limite);
     },
 
     metricas() {
