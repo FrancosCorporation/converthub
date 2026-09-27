@@ -1,6 +1,6 @@
 # ConvertHub — Self-hosted File Converter
 
-![Status](https://img.shields.io/badge/M1b-funcionando%20(10%2F10%20testes)-brightgreen)
+![Status](https://img.shields.io/badge/M2-funcionando%20(13%2F13%20testes)-brightgreen)
 ![CI](https://img.shields.io/badge/CI-test%20%2B%20license%20check-blue)
 ![Node](https://img.shields.io/badge/Node-%3E%3D18-green?logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -19,7 +19,8 @@ Self-hosted file conversion with a job queue: upload → queue (SQLite) → work
 - [x] **Validação por MAGIC BYTES** (não extensão): MP4 com nome .png é detectado como vídeo!
 - [x] **M1b** — Painel de jobs (status/progresso/erros em tempo real) + upload API + **download do resultado** + limite 50MB + worker pool 2x
 - [x] **E2E provado (10/10):** upload PNG → worker → download WEBP (RIFF) completo
-- [ ] **M2** — Múltiplos formatos por categoria, preview antes/depois
+- [x] **M2** — **Worker pool com concorrência** (3 workers, lock anti-duplicação provado) +
+      formatos por categoria (imagem/audio/video) — 13/13 testes
 
 ## Quick start
 
