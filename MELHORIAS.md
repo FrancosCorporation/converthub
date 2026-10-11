@@ -318,10 +318,10 @@ com `sharp` (imagem) ou `ffpeg` (áudio/vídeo) e expõe download do resultado +
 ### DEVOPS-02 · Sem `.env.example` · [P3]
 
 - **Arquivo:** *(ausente)* `.env.example` · `server.js:10,12`
-- **Evidência:** lê `PORT` e `CONVERTHUB_DB`.
+- **Evidência:** lê `PORT` e `CONVERTHUB_DB`; `CONVERTHUB_UPLOADS` também configura a pasta persistente de entradas pendentes.
 - **Impacto:** baixo; evita adivinhação.
-- **Mudança:** `.env.example` com `PORT=3700`, `CONVERTHUB_DB=converthub.db`.
-- **Aceite:** exemplo versionado cobre as 2 variáveis.
+- **Mudança:** `.env.example` com `PORT=3700`, `CONVERTHUB_DB=converthub.db` e `CONVERTHUB_UPLOADS=uploads`.
+- **Aceite:** exemplo versionado cobre as 3 variáveis.
 - **Verificação:** `diff` entre `process.env.*` e as chaves do exemplo.
 
 ---
@@ -421,7 +421,7 @@ com `sharp` (imagem) ou `ffpeg` (áudio/vídeo) e expõe download do resultado +
 - [ ] `TEST-01` — 3 casos de path traversal no `formato`
 - [ ] `TEST-02` — upload inválido não cresce o disco
 - [ ] `DEVOPS-01` — nenhum `.db` no índice
-- [ ] `DEVOPS-02` — `.env.example` com as 2 variáveis
+- [ ] `DEVOPS-02` — `.env.example` com as 3 variáveis
 - [ ] `DOC-01` — README lista ffmpeg/sharp/disco
 
 **Validação final:**
@@ -435,3 +435,21 @@ git ls-files | grep -c '\\.db$'   # 0
 
 *Fim do plano. Gerado por leitura direta do código em 2026-10-02. Nenhum item já estava corrigido*
 *— todos apontam para defeitos ainda presentes.*
+
+## 11. Registro de execução · 2026-10-11
+
+Implementações feitas nesta rodada:
+
+- **SEC-03, SEC-01 e BUG-02:** formatos permitidos por tipo são validados na fila e antes de gravar; os caminhos de saída usam nomes internos e são restringidos a diretórios temporários ConvertHub.
+- **SEC-02:** upload binário tem teto de 50 MiB e é validado por magic bytes antes de persistir. Entradas inválidas não criam arquivo.
+- **SEC-04:** 20 uploads por hora/IP, no máximo quatro simultâneos, teto de 1 GiB no diretório e respostas `429`/`507`.
+- **BUG-01 e IMP-01:** downloads validam o caminho dentro de `os.tmpdir()`; a listagem não retorna caminhos de entrada/saída nem detalhes internos.
+- **BUG-03:** erros internos são registrados no servidor e a API retorna mensagem genérica.
+- **BUG-04:** workers reservam jobs em transação SQLite e o ciclo do servidor não inicia lotes sobrepostos. `src/pool.js` usa a mesma reserva da fila.
+- **BUG-05:** saídas expiram após uma hora; uploads órfãos e diretórios temporários órfãos são limpos depois de 24 horas.
+- **SEC-05:** Helmet, política de conteúdo com assets externos e interface renderizada sem `innerHTML`.
+- **DEVOPS-02 e DOC-01:** `.env.example`, README, SECURITY.md, Docker e Compose atualizados. Compose publica apenas em loopback, persiste o SQLite e entradas pendentes no volume e não monta o `/tmp` do host.
+- `converthub.db` já não estava no índice do Git; a regra `*.db` foi mantida. Os arquivos locais preexistentes em `uploads/` foram preservados e agora ficam ignorados.
+- A auditoria de dependências identificou uma vulnerabilidade alta em `sharp`; o lockfile foi atualizado para a versão corrigida dentro da faixa já declarada. A auditoria final de dependências não reportou vulnerabilidades.
+
+Não foram adicionados nem executados testes automatizados nesta rodada. `TEST-01`, `TEST-02` e a validação final permanecem pendentes; todas as caixas da DoD continuam desmarcadas.

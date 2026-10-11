@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+uploads
+.env
+.env.*
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log

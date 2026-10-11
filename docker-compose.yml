@@ -2,12 +2,13 @@ services:
   converthub:
     build: .
     ports:
-      - "3700:3700"
+      - "127.0.0.1:${PORT:-3700}:${PORT:-3700}"
     environment:
-      CONVERTHUB_DB: /data/jobs.db
+      PORT: ${PORT:-3700}
+      CONVERTHUB_DB: /data/converthub.db
+      CONVERTHUB_UPLOADS: /data/uploads
     volumes:
       - dados:/data
-      - /tmp:/tmp
     restart: unless-stopped
 
 volumes:

@@ -1,7 +1,7 @@
 {
  "name": "converthub",
  "version": "0.1.0",
- "description": "Conversor de arquivos self-hosted: fila de jobs + workers (sharp/ffmpeg) + painel",
+ "description": "Conversor self-hosted com validação de uploads, fila SQLite e workers para imagem e mídia",
  "main": "server.js",
  "type": "module",
  "license": "MIT",
@@ -12,9 +12,10 @@
  },
  "dependencies": {
   "express": "^4.21.0",
-  "sharp": "^0.35.4"
+  "helmet": "^8.3.0",
+  "sharp": "^0.35.5"
  },
  "engines": {
-  "node": ">=18"
+  "node": ">=22.5.0"
  }
 }
