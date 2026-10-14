@@ -453,3 +453,7 @@ Implementações feitas nesta rodada:
 - A auditoria de dependências identificou uma vulnerabilidade alta em `sharp`; o lockfile foi atualizado para a versão corrigida dentro da faixa já declarada. A auditoria final de dependências não reportou vulnerabilidades.
 
 Não foram adicionados nem executados testes automatizados nesta rodada. `TEST-01`, `TEST-02` e a validação final permanecem pendentes; todas as caixas da DoD continuam desmarcadas.
+
+## 11.1 Registro de execução · 2026-10-14
+
+- **DEVOPS-03 (CI previsível):** runner fixado em `ubuntu-24.04`, actions v7 pinadas por SHA, matriz Node 22/24, `npm ci` e gate `npm audit --audit-level=high` antes da suíte. Criados `plan.md` e `resumo.md` padronizados. Banco local `converthub.db` (não rastreado) preservado com SHA-256 em `.local-preserved/converthub/` antes da remoção do checkout.
